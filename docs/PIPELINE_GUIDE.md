@@ -31,6 +31,15 @@ Organizza e rimuove i loghi (delogo) dalle clip video grezze in `input_delogo/`.
     - `--project`: Nome del progetto.
     - `--show-logo`: Mostra l'area del logo invece di rimuoverla (per debugging).
 
+## Interfaccia Grafica (GUI)
+Per un'esperienza più intuitiva, puoi lanciare la GUI:
+```bash
+python3 gui.py
+```
+L'interfaccia riproduce esattamente i 4 step descritti sotto. In ogni tab troverai un campo **Project Name** che devi compilare per far sì che la GUI punti alle cartelle corrette del tuo progetto.
+
+---
+
 ### 2. Sincronizzazione Testo e Audio ([2_auto_lyrics_subtitles_groq.py](file:///Volumes/Ext_drive/dev/ai_video_maker/2_auto_lyrics_subtitles_groq.py))
 Utilizza Groq Whisper per trascrivere la stem vocale e allinearla al testo fornito.
 - **Esempio**: `python3 2_auto_lyrics_subtitles_groq.py --project relive`

@@ -162,6 +162,7 @@ class Tab1(QWidget):
         super().__init__(parent)
 
         # ── parameters ──
+        self.project    = _line("e.g. relive", "")
         self.input_dir  = _PathEdit("folder", default_text=str(BASE_DIR / "input_delogo"))
         self.repo_dir   = _PathEdit("folder", default_text=str(BASE_DIR / "videorepo"))
         self.box_config = _PathEdit("open", "JSON (*.json)", default_text=str(BASE_DIR / "delogo_boxes.json"))
@@ -176,6 +177,9 @@ class Tab1(QWidget):
         vlay.setAlignment(Qt.AlignTop)
         vlay.setSpacing(10)
 
+        vlay.addWidget(_group("Project",
+            ("Project Name (subfolder):", self.project),
+        ))
         vlay.addWidget(_group("Directories",
             ("Input dir (videos with logo):", self.input_dir),
             ("Video repo (output):", self.repo_dir),
@@ -198,29 +202,25 @@ class Tab1(QWidget):
         return []  # args handled by build_cmd
 
     def build_cmd(self) -> list[str]:
-        """Build the command to run, patching module constants via -c."""
-        input_dir  = self.input_dir.text()  or str(BASE_DIR / "input_delogo")
-        repo_dir   = self.repo_dir.text()   or str(BASE_DIR / "videorepo")
-        box_config = self.box_config.text() or str(BASE_DIR / "delogo_boxes.json")
-        preset     = self.preset.currentText()
-        crf        = str(self.crf.value())
-        show_logo  = str(self.show_logo.isChecked())
-
-        snippet = (
-            "import sys, types; "
-            f"sys.path.insert(0, r'{str(BASE_DIR)}'); "
-            "import importlib.util, pathlib, json; "
-            f"spec = importlib.util.spec_from_file_location('m', r'{SCRIPT_1}'); "
-            "m = importlib.util.module_from_spec(spec); "
-            f"m.INPUT_DIR = pathlib.Path(r'{input_dir}'); "
-            f"m.REPO_DIR = pathlib.Path(r'{repo_dir}'); "
-            f"m.BOX_CONFIG_PATH = pathlib.Path(r'{box_config}'); "
-            f"m.FFMPEG_PRESET = '{preset}'; "
-            f"m.FFMPEG_CRF = '{crf}'; "
-            "spec.loader.exec_module(m); "
-            f"m.main()"
-        )
-        return [sys.executable, "-c", snippet]
+        """Build the command to run."""
+        args = [sys.executable, SCRIPT_1]
+        
+        project = self.project.text().strip()
+        if project:
+            args.extend(["--project", project])
+            
+        input_dir  = self.input_dir.text()
+        if input_dir and input_dir != str(BASE_DIR / "input_delogo"):
+            args.extend(["--input-dir", input_dir])
+            
+        repo_dir   = self.repo_dir.text()
+        if repo_dir and repo_dir != str(BASE_DIR / "videorepo"):
+            args.extend(["--repo-dir", repo_dir])
+            
+        if self.show_logo.isChecked():
+            args.append("--show-logo")
+            
+        return args
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -241,8 +241,9 @@ class Tab2(QWidget):
         _lyrics_dir  = str(BASE_DIR / "input_automated" / "lyrics")
         _subs_dir    = str(BASE_DIR / "input_automated" / "subtitles")
 
-        # ── Dirs ──
-        self.workdir       = _PathEdit("folder", default_text=_workdir)
+        # ── Parameters ──
+        self.project = _line("e.g. relive", "")
+        self.workdir = _PathEdit("folder", default_text=_workdir)
         self.stem_dir      = _PathEdit("folder", default_text=_stem_dir, placeholder="<workdir>/vocal_stems")
         self.lyrics_dir    = _PathEdit("folder", default_text=_lyrics_dir, placeholder="<workdir>/lyrics")
         self.subtitles_dir = _PathEdit("folder", default_text=_subs_dir, placeholder="<workdir>/subtitles")
@@ -285,6 +286,9 @@ class Tab2(QWidget):
         vlay = QVBoxLayout(content)
         vlay.setAlignment(Qt.AlignTop)
         vlay.setSpacing(10)
+        vlay.addWidget(_group("Project",
+            ("Project Name:", self.project),
+        ))
         vlay.addWidget(_group("Directories",
             ("Workdir:", self.workdir),
             ("Stem dir:", self.stem_dir),
@@ -356,6 +360,7 @@ class Tab2(QWidget):
             elif isinstance(widget, QComboBox):
                 args.extend([flag, widget.currentText()])
 
+        _add("--project",        self.project)
         _add("--workdir",       self.workdir)
         _add("--stem-dir",      self.stem_dir)
         _add("--lyrics-dir",    self.lyrics_dir)
@@ -415,7 +420,8 @@ class Tab3(QWidget):
         _video_dir  = str(BASE_DIR / "input_automated" / "video_clips")
         _output_dir = str(BASE_DIR / "output_automated")
 
-        # ── Directories ──
+        # ── Parameters ──
+        self.project = _line("e.g. relive", "")
         self.workdir    = _PathEdit("folder", default_text=_workdir)
         self.audio_dir  = _PathEdit("folder", default_text=_audio_dir,  placeholder="<workdir>/audio")
         self.video_dir  = _PathEdit("folder", default_text=_video_dir,  placeholder="<workdir>/video_clips")
@@ -465,6 +471,9 @@ class Tab3(QWidget):
         vlay.setAlignment(Qt.AlignTop)
         vlay.setSpacing(10)
 
+        vlay.addWidget(_group("Project",
+            ("Project Name:", self.project),
+        ))
         vlay.addWidget(_group("Directories & Output",
             ("Workdir:", self.workdir),
             ("Audio dir:", self.audio_dir),
@@ -531,6 +540,7 @@ class Tab3(QWidget):
             if widget.isChecked():
                 args.append(flag)
 
+        _add("--project",    self.project)
         _add("--workdir",    self.workdir)
         _add("--audio-dir",  self.audio_dir)
         _add("--video-dir",  self.video_dir)
@@ -598,6 +608,8 @@ class Tab4(QWidget):
         PLATFORMS = ["instagram_reels", "tiktok", "youtube_shorts", "generic"]
         PRESETS   = ["ultrafast","superfast","veryfast","faster","fast","medium","slow","slower","veryslow"]
 
+        # ── Parameters ──
+        self.project = _line("e.g. relive", "")
         _video_dir  = str(BASE_DIR / "output_automated")
         _subs_dir   = str(BASE_DIR / "input_automated" / "subtitles")
         _output_dir = str(BASE_DIR / "output_automated")
@@ -653,6 +665,9 @@ class Tab4(QWidget):
         vlay = QVBoxLayout(content)
         vlay.setAlignment(Qt.AlignTop)
         vlay.setSpacing(10)
+        vlay.addWidget(_group("Project",
+            ("Project Name:", self.project),
+        ))
         vlay.addWidget(_group("Input / Output",
             ("Input video:", self.video),
             ("SRT file:", self.srt),
@@ -719,6 +734,7 @@ class Tab4(QWidget):
             if widget.isChecked():
                 args.append(flag)
 
+        _add("--project",  self.project)
         _add("--video",  self.video)
         _add("--srt",    self.srt)
         _add("--ass",    self.ass)

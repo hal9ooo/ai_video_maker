@@ -42,6 +42,13 @@ A powerful, automated pipeline for creating professional music videos with synch
    ```bash
    python3 1_organize_and_delogo.py --project <project_name>
    ```
+### Using the GUI
+If you prefer a visual interface, you can use the built-in GUI:
+```bash
+python3 gui.py
+```
+The GUI provides tabs for each step and allows you to select the project name, which will automatically configure the correct input/output paths.
+
 2. **Generate Subtitles**: Provide a vocal stem and lyrics in `input_automated/<project_name>`:
    ```bash
    python3 2_auto_lyrics_subtitles_groq.py --project <project_name>
