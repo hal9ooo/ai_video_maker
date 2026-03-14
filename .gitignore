@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Runtime/work dirs
+# input/
+# videorepo/
+_cleanup_trash_20260218/
+# output.mp4 - keep this or not? The user might want to track it.
+# Common media files are now tracked by LFS in .gitattributes
+
+# Local secrets
+groq.conf
+
+# Media and Assets
+input_automated/
+input_delogo/
+output_automated/
+videorepo/
+delogo_boxes.json

@@ -1,0 +1,5 @@
+# Groq configuration template
+# Save this file as groq.conf and fill in your API key.
+
+# Your Groq API Key (get it from https://console.groq.com/keys)
+GROQ_API_KEY=your_api_key_here

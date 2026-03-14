@@ -1,0 +1,17 @@
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.mkv filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.7z filter=lfs diff=lfs merge=lfs -text
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
+
+# Directory-based tracking for inputs/outputs
+input*/** filter=lfs diff=lfs merge=lfs -text
+videorepo/** filter=lfs diff=lfs merge=lfs -text
+output*/** filter=lfs diff=lfs merge=lfs -text
+
+# Specific root files committed to LFS
+requirements.txt filter=lfs diff=lfs merge=lfs -text
+delogo_boxes.json filter=lfs diff=lfs merge=lfs -text
